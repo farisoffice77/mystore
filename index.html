@@ -1,33 +1,170 @@
 <!DOCTYPE html>
-<html><head>
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>My Store</title>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>My Jersey Store</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Pacifico&family=Fraunces:wght@600&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-body{font-family:sans-serif;margin:0;padding:12px}
-input{width:100%;padding:12px;border-radius:25px;border:1px solid #ccc;box-sizing:border-box}
-#grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
-.card img{width:100%;aspect-ratio:3/4;object-fit:cover}
-.old{text-decoration:line-through;color:#888}
+:root{--ink:#0b1226;--mut:#667085;--line:#e4e4e0;--soft:#f4f4f1;--red:#c8102e}
+*{box-sizing:border-box}
+body{margin:0;font-family:'DM Sans',system-ui,sans-serif;color:var(--ink);background:#fff}
+a{color:inherit;text-decoration:none}button,select,input,textarea{font:inherit}button{cursor:pointer}
+.top{background:var(--ink);color:#fff;text-align:center;font-size:12px;letter-spacing:.18em;padding:10px;font-weight:700}
+header{position:sticky;top:0;z-index:30;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--line)}
+.logo{font-family:'Pacifico',cursive;font-size:26px;color:var(--ink)}
+.ic{background:none;border:0;font-size:22px;padding:6px 8px;position:relative;color:var(--ink)}
+.cnt{position:absolute;top:-1px;right:-2px;background:var(--red);color:#fff;border-radius:10px;font-size:11px;padding:1px 6px}
+#menu{position:fixed;inset:0;background:#fff;z-index:25;display:none;flex-direction:column;align-items:center;justify-content:center;gap:26px;font-size:24px}
+#menu.on{display:flex}
+main{max-width:1100px;margin:auto;padding:0 16px 40px}
+h2{font-family:'Fraunces',serif;font-size:30px;text-align:center;margin:40px 0 20px;font-weight:600}
+h2.up{font-family:'DM Sans',sans-serif;font-size:20px;letter-spacing:.04em;text-transform:uppercase;font-weight:700}
+.hero{margin:0 -16px;padding:54px 22px;background:linear-gradient(120deg,#e9e9e4,#cfd6e4);background-size:cover;background-position:center}
+.hero small{letter-spacing:.2em;font-weight:700;font-size:12px}
+.hero h1{font-family:'Bebas Neue',sans-serif;font-size:64px;line-height:.92;margin:14px 0;font-weight:400}
+.hero p{margin:0 0 22px;color:#3b4256}
+.btn{display:inline-block;background:var(--ink);color:#fff;border:1px solid var(--ink);padding:14px 26px;border-radius:6px;font-weight:700;text-align:center}
+.btn.o{background:#fff;color:var(--ink);width:100%;margin-top:10px}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.trust{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:0 -16px;padding:16px;background:var(--soft);font-size:12px;color:var(--mut)}
+.trust b{display:block;color:var(--ink);font-size:12px}
+.cats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.cats a{border:1px solid var(--ink);border-radius:4px;overflow:hidden;text-align:center;font-weight:500}
+.cats img{width:100%;aspect-ratio:1;object-fit:cover;background:var(--soft);display:block}
+.cats span{display:block;padding:8px 2px;text-transform:uppercase;font-size:11px;font-weight:500}
+.promo{margin:34px -16px 0;border-block:1px solid var(--ink);padding:16px;text-align:center;letter-spacing:.14em;font-weight:700;font-size:13px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.card .im{position:relative;aspect-ratio:3/4;background:var(--soft);overflow:hidden}
+.card img,.big img{width:100%;height:100%;object-fit:cover;display:block}
+.b{position:absolute;top:10px;left:10px;background:var(--ink);color:#fff;font-size:11px;font-weight:700;letter-spacing:.12em;padding:6px 10px;border-radius:14px}
+.n{margin:10px 0 4px;font-size:13px;text-transform:uppercase}
+s{color:var(--mut);margin-left:4px}em{color:var(--red);font-style:normal;font-size:12px;margin-left:4px}
+.srch{width:100%;padding:14px 20px;border:1px solid var(--line);border-radius:30px}
+.row{display:flex;gap:10px;margin:12px 0 18px}.row select{flex:1;padding:11px;border:1px solid var(--line);border-radius:8px;background:#fff}
+.pg{display:grid;gap:22px;padding-top:16px}
+.big{aspect-ratio:3/4;background:var(--soft);border-radius:10px;overflow:hidden}
+.th{display:flex;gap:10px;margin-top:10px}.th img{width:68px;height:68px;object-fit:cover;border-radius:8px;border:1px solid var(--line);cursor:pointer}
+.pt{font-size:24px;text-transform:uppercase;margin:8px 0;font-weight:500}
+.tag{background:#0c4a34;color:#fff;font-size:13px;padding:6px 12px;border-radius:16px;font-weight:700}
+.pr{font-size:26px;margin:10px 0}.ft{list-style:none;padding:0;color:#3b4256;line-height:2}
+.sz{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
+.sz button{padding:14px;border:1px solid var(--line);background:#fff;border-radius:8px;font-weight:700}
+.sz button.on{border-color:var(--ink);background:var(--ink);color:#fff}
+.sz button:disabled{opacity:.35;text-decoration:line-through}
+.qr{display:flex;gap:10px}.q{display:flex;align-items:center;border:1px solid var(--line);border-radius:8px}
+.q button{border:0;background:none;font-size:20px;padding:12px 16px}.q span{min-width:26px;text-align:center}.qr .btn{flex:1}
+.ci{display:flex;gap:12px;padding:14px 0;border-bottom:1px solid var(--line)}
+.ci img{width:84px;height:104px;object-fit:cover;border-radius:6px}.ci div{flex:1;font-size:14px}
+.ci .q{display:inline-flex;margin-top:8px}.ci .q button{padding:4px 12px}
+.rm{background:none;border:0;color:var(--red);padding:0;margin-left:10px}
+.tot{display:flex;justify-content:space-between;font-size:20px;font-weight:700;padding:16px 0}
+.fm input,.fm textarea{width:100%;padding:13px;border:1px solid var(--line);border-radius:8px;margin-bottom:10px}
+.ship{background:var(--soft);padding:10px 14px;border-radius:8px;font-size:13px;margin:12px 0}
+#toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:12px 20px;border-radius:8px;display:none;z-index:40}
+footer{text-align:center;color:var(--mut);font-size:13px;padding:26px 16px;border-top:1px solid var(--line)}
+@media(min-width:800px){.grid{grid-template-columns:repeat(4,1fr)}.cats span{font-size:14px;padding:12px}.trust{grid-template-columns:repeat(4,1fr)}.pg{grid-template-columns:1fr 1fr;gap:44px}.hero{margin:0;border-radius:10px;padding:90px 56px}.hero h1{font-size:96px}.trust,.promo{margin-left:0;margin-right:0}}
 </style></head><body>
-<input id="q" placeholder="Search products">
-<div id="grid"></div>
+<div class="top" id="tag"></div>
+<header>
+<button class="ic" id="mb" aria-label="Menu">☰</button>
+<a class="logo" href="#" id="logo"></a>
+<div><button class="ic" id="sb" aria-label="Search">⌕</button><button class="ic" id="cb" aria-label="Cart">🛍<span class="cnt" id="cn" hidden>0</span></button></div>
+</header>
+<nav id="menu"><a href="#">Home</a><a href="#shop">Collections</a><a href="#contact">Contact</a><a href="#cart">Cart</a></nav>
+<main id="app"><p style="text-align:center;padding:60px 0">Loading…</p></main>
+<footer id="foot"></footer><div id="toast"></div>
 <script>
-const API = 'https://script.google.com/macros/s/AKfycby8aVJEu-qLAWz3Tf7HQXELxqBScIxT81k_Xpyyc_KhULC9W-QBFUKtFSSH4mG4cAGudQ/exec';
-let all = [];
-fetch(API).then(r => r.json()).then(d => { all = d; show(d); });
-function show(list){
-  grid.innerHTML = list.map(p => `
-    <div class="card">
-      <img src="${p.image}">
-      <div>${p.name}</div>
-      <b>₹${p.price}</b> <span class="old">₹${p.oldPrice}</span>
-    </div>`).join('');
-}
-q.oninput = () => show(all.filter(p => p.name.toLowerCase().includes(q.value.toLowerCase())));
+// ===== SETTINGS: change these =====
+const BRAND='My Jersey Store';
+const TAGLINE='PLAY BOLD, WEAR PRIDE';
+const API='https://script.google.com/macros/s/AKfycby8aVJEu-qLAWz3Tf7HQXELxqBScIxT81k_Xpyyc_KhULC9W-QBFUKtFSSH4mG4cAGudQ/exec';
+const WA='919656703262';
+const BANNER='';   // optional: direct image link for the home banner
+// ==================================
+const $=s=>document.querySelector(s),app=$('#app');
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let P=[],cart=[],F={q:'',cat:'',sort:''},sel='',qty=1;
+try{cart=JSON.parse(localStorage.getItem('cart')||'[]')}catch(e){}
+const save=()=>{try{localStorage.setItem('cart',JSON.stringify(cart))}catch(e){}$('#cn').textContent=cart.reduce((a,c)=>a+c.qty,0);$('#cn').hidden=!cart.length};
+const toast=t=>{const e=$('#toast');e.textContent=t;e.style.display='block';setTimeout(()=>e.style.display='none',1800)};
+const get=id=>P.find(p=>p.id===id);
+document.title=BRAND;$('#tag').textContent=TAGLINE;$('#logo').textContent=BRAND;
+$('#foot').innerHTML='© '+esc(BRAND)+' · <a href="https://wa.me/'+WA+'">WhatsApp us</a>';
+$('#mb').onclick=()=>{$('#menu').classList.toggle('on');$('#mb').textContent=$('#menu').classList.contains('on')?'✕':'☰'};
+$('#cb').onclick=()=>location.hash='cart';
+$('#sb').onclick=()=>{location.hash='shop';setTimeout(()=>$('#q')&&$('#q').focus(),50)};
 
-function order(o){
-  fetch(API, {method:'POST', headers:{'Content-Type':'text/plain'}, body:JSON.stringify(o)});
-  window.open('https://wa.me/919656703262?text=' + encodeURIComponent(
-    `Order from ${o.name}\n${o.items}\nTotal ₹${o.total}`));
-}
+const card=p=>`<a class="card" href="#p-${esc(p.id)}"><div class="im">${p.tag?`<span class="b">${esc(p.tag)}</span>`:''}<img loading="lazy" src="${esc(p.imgs[0])}" alt=""></div><div class="n">${esc(p.name)}</div><div><b>₹${p.price}</b>${p.old>p.price?`<s>₹${p.old}</s><em>${Math.round(100-p.price/p.old*100)}% off</em>`:''}</div></a>`;
+
+function home(){
+const cats=[...new Set(P.map(p=>p.cat).filter(Boolean))];
+app.innerHTML=`<section class="hero" ${BANNER?`style="background-image:url('${esc(BANNER)}')"`:''}><small>${esc(BRAND.toUpperCase())}</small><h1>HOME OF<br>PREMIUM JERSEYS</h1><p>Premium retro jerseys. Worn with pride.</p><a class="btn" href="#shop">Shop now</a></section>
+<div class="trust"><div><b>High quality jerseys</b>Premium fabric and finish</div><div><b>Secure ordering</b>Confirm on WhatsApp</div><div><b>Fast delivery</b>Pan India shipping</div><div><b>Embroidery jerseys</b>Lasting stitch quality</div></div>
+${cats.length?`<h2 class="up">Top Collection</h2><div class="cats">${cats.map(c=>`<a href="#shop-${encodeURIComponent(c)}"><img src="${esc(P.find(p=>p.cat===c).imgs[0])}" alt=""><span>${esc(c)}</span></a>`).join('')}</div>`:''}
+<div class="promo">BUY 2 JERSEYS, GET FREE SHIPPING</div>
+<h2>New Arrivals</h2><div class="grid">${P.slice(-8).reverse().map(card).join('')}</div>`}
+
+function shop(cat){
+F.cat=cat||'';F.sort='';const cats=[...new Set(P.map(p=>p.cat).filter(Boolean))];
+app.innerHTML=`<h2>Our Full Collection</h2><input id="q" class="srch" placeholder="Search products" value="${esc(F.q)}">
+<div class="row">${cats.length?`<select id="cat"><option value="">All categories</option>${cats.map(c=>`<option ${c===F.cat?'selected':''}>${esc(c)}</option>`).join('')}</select>`:''}<select id="so"><option value="">Sort by</option><option value="a">Price: low to high</option><option value="d">Price: high to low</option></select></div><div id="list" class="grid"></div>`;
+const up=()=>{F.q=$('#q').value;F.cat=$('#cat')?$('#cat').value:'';F.sort=$('#so').value;
+let l=P.filter(p=>(!F.cat||p.cat===F.cat)&&p.name.toLowerCase().includes(F.q.toLowerCase()));
+if(F.sort)l.sort((a,b)=>F.sort=='a'?a.price-b.price:b.price-a.price);
+$('#list').innerHTML=l.map(card).join('')||'<p>No products found. Try another search.</p>'};
+['q','cat','so'].forEach(i=>$('#'+i)&&($('#'+i).oninput=up));up()}
+
+function prod(id){
+const p=get(id);if(!p){app.innerHTML='<h2>Product not found</h2><p style="text-align:center"><a class="btn" href="#shop">Back to shop</a></p>';return}
+sel='';qty=1;const out=p.stock<=0;
+app.innerHTML=`<div class="pg"><div><div class="big"><img id="mi" src="${esc(p.imgs[0])}" alt=""></div><div class="th">${p.imgs.map(i=>`<img src="${esc(i)}" alt="" onclick="$('#mi').src=this.src">`).join('')}</div></div>
+<div>${p.tag?`<span class="tag">${esc(p.tag)}</span>`:''}<h1 class="pt">${esc(p.name)}</h1>
+<div class="pr"><b>₹${p.price}</b>${p.old>p.price?`<s>₹${p.old}</s><em>${Math.round(100-p.price/p.old*100)}% off</em>`:''}</div>
+<ul class="ft"><li>✓ Quality checked before shipping</li><li>✓ Visible product details and accurate sizing</li><li>✓ Fast dispatch across India</li></ul>
+${p.sizes.length?`<p><b>Choose your size:</b></p><div class="sz">${p.sizes.map(s=>`<button data-s="${esc(s)}" onclick="pick(this)">${esc(s)}</button>`).join('')}</div>`:''}
+<div class="qr"><div class="q"><button onclick="qt(-1)">−</button><span id="qv">1</span><button onclick="qt(1)">+</button></div><button class="btn" ${out?'disabled':''} data-id="${esc(p.id)}" onclick="addC(this.dataset.id)">${out?'Sold out':'Add to cart'}</button></div>
+<button class="btn o" ${out?'disabled':''} data-id="${esc(p.id)}" onclick="addC(this.dataset.id,1)">Buy now</button></div></div>`}
+function pick(b){document.querySelectorAll('.sz button').forEach(x=>x.classList.remove('on'));b.classList.add('on');sel=b.dataset.s}
+function qt(d){qty=Math.max(1,qty+d);$('#qv').textContent=qty}
+function addC(id,buy){const p=get(id);if(p.sizes.length&&!sel)return toast('Please choose a size');
+const e=cart.find(c=>c.id===id&&c.size===sel);e?e.qty+=qty:cart.push({id,size:sel,qty});save();
+buy?location.hash='cart':toast('Added to cart')}
+
+const lines=()=>cart.filter(c=>get(c.id));
+const total=()=>lines().reduce((a,c)=>a+get(c.id).price*c.qty,0);
+function cartV(){
+const L=lines();if(!L.length){app.innerHTML='<h2>Your cart</h2><p style="text-align:center">Your cart is empty.</p><p style="text-align:center"><a class="btn" href="#shop">Start shopping</a></p>';return}
+const n=L.reduce((a,c)=>a+c.qty,0);
+app.innerHTML=`<h2>Your cart</h2>${L.map(c=>{const p=get(c.id),i=cart.indexOf(c);return `<div class="ci"><img src="${esc(p.imgs[0])}" alt=""><div><b>${esc(p.name)}</b><br>${c.size?'Size: '+esc(c.size)+'<br>':''}₹${p.price}<br><span class="q"><button onclick="cq(${i},-1)">−</button><span>${c.qty}</span><button onclick="cq(${i},1)">+</button></span><button class="rm" onclick="cq(${i},-99)">Remove</button></div></div>`}).join('')}
+<div class="ship">${n>=2?'Free shipping applied.':'Add 1 more jersey for free shipping.'}</div>
+<div class="tot"><span>Total</span><span>₹${total()}</span></div>
+<div class="fm"><input id="cn2" placeholder="Full name"><input id="cp" type="tel" placeholder="Phone number"><textarea id="ca" rows="3" placeholder="Full delivery address with pincode"></textarea></div>
+<button class="btn" style="width:100%" id="po" onclick="place()">Place order on WhatsApp</button>`}
+function cq(i,d){cart[i].qty+=d;if(cart[i].qty<1)cart.splice(i,1);save();cartV()}
+async function place(){
+const n=$('#cn2').value.trim(),ph=$('#cp').value.trim(),ad=$('#ca').value.trim();
+if(!n||ph.replace(/\D/g,'').length<10||!ad)return toast('Fill name, phone and address');
+const items=lines().map(c=>`${get(c.id).name}${c.size?' ('+c.size+')':''} x${c.qty}`).join(', '),t=total();
+$('#po').disabled=true;$('#po').textContent='Sending…';
+try{await fetch(API,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify({name:n,phone:ph,address:ad,items,total:t})})}catch(e){}
+cart=[];save();
+location.href='https://wa.me/'+WA+'?text='+encodeURIComponent(`New order\nName: ${n}\nPhone: ${ph}\nAddress: ${ad}\nItems: ${items}\nTotal: ₹${t}`)}
+
+function contact(){app.innerHTML=`<h2>Contact</h2><p style="text-align:center">Questions or custom orders? Message us on WhatsApp.</p><p style="text-align:center"><a class="btn" href="https://wa.me/${WA}">Chat on WhatsApp</a></p>`}
+
+function route(){
+const h=decodeURIComponent(location.hash.slice(1));
+$('#menu').classList.remove('on');$('#mb').textContent='☰';scrollTo(0,0);
+if(h.startsWith('p-'))prod(h.slice(2));
+else if(h.startsWith('shop'))shop(h.slice(5));
+else if(h==='cart')cartV();
+else if(h==='contact')contact();
+else home()}
+window.onhashchange=()=>P.length&&route();
+
+save();
+fetch(API).then(r=>r.json()).then(d=>{
+P=d.filter(p=>p.name).map(p=>({id:String(p.id),name:p.name,price:+p.price||0,old:+p.oldPrice||0,tag:p.tag||'',cat:p.category||'',
+imgs:String(p.images||p.image||'').split(',').map(s=>s.trim()).filter(Boolean),
+sizes:String(p.sizes||'').split(/[\s,]+/).filter(Boolean),stock:p.stock===''?99:+p.stock}));
+route()}).catch(()=>{app.innerHTML='<h2>Could not load products</h2><p style="text-align:center">Check the API link in the SETTINGS section of index.html.</p>'});
 </script></body></html>
