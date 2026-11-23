@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>My Jersey Store</title>
+<title>Hello Dear</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Pacifico&family=Fraunces:wght@600&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 :root{--ink:#0b1226;--mut:#667085;--line:#e4e4e0;--soft:#f4f4f1;--red:#c8102e}
@@ -74,8 +74,8 @@ footer{text-align:center;color:var(--mut);font-size:13px;padding:26px 16px;borde
 <footer id="foot"></footer><div id="toast"></div>
 <script>
 // ===== SETTINGS: change these =====
-const BRAND='My Jersey Store';
-const TAGLINE='PLAY BOLD, WEAR PRIDE';
+const BRAND='Hello Dear';
+const TAGLINE='BUDGET & PREMIUM FANCY ORNAMENTS';
 const API='https://script.google.com/macros/s/AKfycby8aVJEu-qLAWz3Tf7HQXELxqBScIxT81k_Xpyyc_KhULC9W-QBFUKtFSSH4mG4cAGudQ/exec';
 const WA='919656703262';
 const BANNER='';   // optional: direct image link for the home banner
@@ -97,10 +97,10 @@ const card=p=>`<a class="card" href="#p-${esc(p.id)}"><div class="im">${p.tag?`<
 
 function home(){
 const cats=[...new Set(P.map(p=>p.cat).filter(Boolean))];
-app.innerHTML=`<section class="hero" ${BANNER?`style="background-image:url('${esc(BANNER)}')"`:''}><small>${esc(BRAND.toUpperCase())}</small><h1>HOME OF<br>PREMIUM JERSEYS</h1><p>Premium retro jerseys. Worn with pride.</p><a class="btn" href="#shop">Shop now</a></section>
-<div class="trust"><div><b>High quality jerseys</b>Premium fabric and finish</div><div><b>Secure ordering</b>Confirm on WhatsApp</div><div><b>Fast delivery</b>Pan India shipping</div><div><b>Embroidery jerseys</b>Lasting stitch quality</div></div>
+app.innerHTML=`<section class="hero" ${BANNER?`style="background-image:url('${esc(BANNER)}')"`:''}><small>${esc(BRAND.toUpperCase())}</small><h1>FANCY ORNAMENTS<br>FOR EVERY STYLE</h1><p>Budget and premium ornaments, delivered all over India.</p><a class="btn" href="#shop">Shop now</a></section>
+<div class="trust"><div><b>Budget and premium</b>Ornaments for every occasion</div><div><b>Secure ordering</b>Confirmed on WhatsApp</div><div><b>All India delivery</b>We ship across India</div><div><b>Quality checked</b>Inspected before shipping</div></div>
 ${cats.length?`<h2 class="up">Top Collection</h2><div class="cats">${cats.map(c=>`<a href="#shop-${encodeURIComponent(c)}"><img src="${esc(P.find(p=>p.cat===c).imgs[0])}" alt=""><span>${esc(c)}</span></a>`).join('')}</div>`:''}
-<div class="promo">BUY 2 JERSEYS, GET FREE SHIPPING</div>
+<div class="promo">ALL INDIA DELIVERY · SECURE ORDERING</div>
 <h2>New Arrivals</h2><div class="grid">${P.slice(-8).reverse().map(card).join('')}</div>`}
 
 function shop(cat){
@@ -119,13 +119,13 @@ sel='';qty=1;const out=p.stock<=0;
 app.innerHTML=`<div class="pg"><div><div class="big"><img id="mi" src="${esc(p.imgs[0])}" alt=""></div><div class="th">${p.imgs.map(i=>`<img src="${esc(i)}" alt="" onclick="$('#mi').src=this.src">`).join('')}</div></div>
 <div>${p.tag?`<span class="tag">${esc(p.tag)}</span>`:''}<h1 class="pt">${esc(p.name)}</h1>
 <div class="pr"><b>₹${p.price}</b>${p.old>p.price?`<s>₹${p.old}</s><em>${Math.round(100-p.price/p.old*100)}% off</em>`:''}</div>
-<ul class="ft"><li>✓ Quality checked before shipping</li><li>✓ Visible product details and accurate sizing</li><li>✓ Fast dispatch across India</li></ul>
-${p.sizes.length?`<p><b>Choose your size:</b></p><div class="sz">${p.sizes.map(s=>`<button data-s="${esc(s)}" onclick="pick(this)">${esc(s)}</button>`).join('')}</div>`:''}
+<ul class="ft"><li>✓ Quality checked before shipping</li><li>✓ Clear photos and accurate details</li><li>✓ Delivery across India</li></ul>
+${p.sizes.length?`<p><b>Choose an option:</b></p><div class="sz">${p.sizes.map(s=>`<button data-s="${esc(s)}" onclick="pick(this)">${esc(s)}</button>`).join('')}</div>`:''}
 <div class="qr"><div class="q"><button onclick="qt(-1)">−</button><span id="qv">1</span><button onclick="qt(1)">+</button></div><button class="btn" ${out?'disabled':''} data-id="${esc(p.id)}" onclick="addC(this.dataset.id)">${out?'Sold out':'Add to cart'}</button></div>
 <button class="btn o" ${out?'disabled':''} data-id="${esc(p.id)}" onclick="addC(this.dataset.id,1)">Buy now</button></div></div>`}
 function pick(b){document.querySelectorAll('.sz button').forEach(x=>x.classList.remove('on'));b.classList.add('on');sel=b.dataset.s}
 function qt(d){qty=Math.max(1,qty+d);$('#qv').textContent=qty}
-function addC(id,buy){const p=get(id);if(p.sizes.length&&!sel)return toast('Please choose a size');
+function addC(id,buy){const p=get(id);if(p.sizes.length&&!sel)return toast('Please choose an option');
 const e=cart.find(c=>c.id===id&&c.size===sel);e?e.qty+=qty:cart.push({id,size:sel,qty});save();
 buy?location.hash='cart':toast('Added to cart')}
 
@@ -133,9 +133,8 @@ const lines=()=>cart.filter(c=>get(c.id));
 const total=()=>lines().reduce((a,c)=>a+get(c.id).price*c.qty,0);
 function cartV(){
 const L=lines();if(!L.length){app.innerHTML='<h2>Your cart</h2><p style="text-align:center">Your cart is empty.</p><p style="text-align:center"><a class="btn" href="#shop">Start shopping</a></p>';return}
-const n=L.reduce((a,c)=>a+c.qty,0);
-app.innerHTML=`<h2>Your cart</h2>${L.map(c=>{const p=get(c.id),i=cart.indexOf(c);return `<div class="ci"><img src="${esc(p.imgs[0])}" alt=""><div><b>${esc(p.name)}</b><br>${c.size?'Size: '+esc(c.size)+'<br>':''}₹${p.price}<br><span class="q"><button onclick="cq(${i},-1)">−</button><span>${c.qty}</span><button onclick="cq(${i},1)">+</button></span><button class="rm" onclick="cq(${i},-99)">Remove</button></div></div>`}).join('')}
-<div class="ship">${n>=2?'Free shipping applied.':'Add 1 more jersey for free shipping.'}</div>
+app.innerHTML=`<h2>Your cart</h2>${L.map(c=>{const p=get(c.id),i=cart.indexOf(c);return `<div class="ci"><img src="${esc(p.imgs[0])}" alt=""><div><b>${esc(p.name)}</b><br>${c.size?'Option: '+esc(c.size)+'<br>':''}₹${p.price}<br><span class="q"><button onclick="cq(${i},-1)">−</button><span>${c.qty}</span><button onclick="cq(${i},1)">+</button></span><button class="rm" onclick="cq(${i},-99)">Remove</button></div></div>`}).join('')}
+<div class="ship">Delivery across India. We confirm your order on WhatsApp.</div>
 <div class="tot"><span>Total</span><span>₹${total()}</span></div>
 <div class="fm"><input id="cn2" placeholder="Full name"><input id="cp" type="tel" placeholder="Phone number"><textarea id="ca" rows="3" placeholder="Full delivery address with pincode"></textarea></div>
 <button class="btn" style="width:100%" id="po" onclick="place()">Place order on WhatsApp</button>`}
@@ -149,7 +148,7 @@ try{await fetch(API,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/
 cart=[];save();
 location.href='https://wa.me/'+WA+'?text='+encodeURIComponent(`New order\nName: ${n}\nPhone: ${ph}\nAddress: ${ad}\nItems: ${items}\nTotal: ₹${t}`)}
 
-function contact(){app.innerHTML=`<h2>Contact</h2><p style="text-align:center">Questions or custom orders? Message us on WhatsApp.</p><p style="text-align:center"><a class="btn" href="https://wa.me/${WA}">Chat on WhatsApp</a></p>`}
+function contact(){app.innerHTML=`<h2>Contact</h2><p style="text-align:center">Questions about an order or a design? Message us on WhatsApp.</p><p style="text-align:center"><a class="btn" href="https://wa.me/${WA}">Chat on WhatsApp</a></p>`}
 
 function route(){
 const h=decodeURIComponent(location.hash.slice(1));
