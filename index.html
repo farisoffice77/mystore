@@ -141,10 +141,10 @@ app.innerHTML=`<h2>Your cart</h2>${L.map(c=>{const p=get(c.id),i=cart.indexOf(c)
 function cq(i,d){cart[i].qty+=d;if(cart[i].qty<1)cart.splice(i,1);save();cartV()}
 async function place(){
 const n=$('#cn2').value.trim(),ph=$('#cp').value.trim(),ad=$('#ca').value.trim();
-if(!n||ph.replace(/\D/g,'').length<10||!ad)return toast('Fill name, phone and address');
+if(!n||ph.replace(/\D/g,'').length<10||!ad)return alert('Please fill your name, a 10-digit phone number and your full address.');
 const items=lines().map(c=>`${get(c.id).name}${c.size?' ('+c.size+')':''} x${c.qty}`).join(', '),t=total();
 $('#po').disabled=true;$('#po').textContent='Sending…';
-try{await fetch(API,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify({name:n,phone:ph,address:ad,items,total:t})})}catch(e){}
+try{await Promise.race([fetch(API,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify({name:n,phone:ph,address:ad,items,total:t})}),new Promise(r=>setTimeout(r,2500))])}catch(e){}
 cart=[];save();
 location.href='https://wa.me/'+WA+'?text='+encodeURIComponent(`New order\nName: ${n}\nPhone: ${ph}\nAddress: ${ad}\nItems: ${items}\nTotal: ₹${t}`)}
 
