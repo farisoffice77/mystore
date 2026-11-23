@@ -1,6 +1,9 @@
+
 <!DOCTYPE html>
-<html lang="en"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Hello Dear</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Pacifico&family=Fraunces:wght@600&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
@@ -68,7 +71,9 @@ footer{text-align:center;color:var(--mut);font-size:13px;padding:26px 16px;borde
 .wa{position:fixed;right:16px;bottom:18px;z-index:35;background:#25d366;color:#fff;border-radius:30px;padding:12px 16px;font-weight:700;font-size:14px;box-shadow:0 4px 14px rgba(0,0,0,.25)}
 .paybox{max-width:420px;margin:auto}
 @media(min-width:800px){.grid{grid-template-columns:repeat(4,1fr)}.cats span{font-size:14px;padding:12px}.trust{grid-template-columns:repeat(4,1fr)}.pg{grid-template-columns:1fr 1fr;gap:44px}.hero{margin:0;border-radius:10px;padding:90px 56px}.hero h1{font-size:96px}.trust,.promo{margin-left:0;margin-right:0}}
-</style></head><body>
+</style>
+</head>
+<body>
 <div class="top" id="tag"></div>
 <header>
 <button class="ic" id="mb" aria-label="Menu">☰</button>
@@ -79,15 +84,17 @@ footer{text-align:center;color:var(--mut);font-size:13px;padding:26px 16px;borde
 <main id="app"><p style="text-align:center;padding:60px 0">Loading…</p></main>
 <a class="wa" id="wab" href="#">💬 WhatsApp</a>
 <footer id="foot"></footer><div id="toast"></div>
+
 <script>
-// ===== SETTINGS: change these =====
+// ===== SETTINGS =====
 const BRAND='Hello Dear';
 const TAGLINE='BUDGET & PREMIUM FANCY ORNAMENTS';
 const API='https://script.google.com/macros/s/AKfycby8aVJEu-qLAWz3Tf7HQXELxqBScIxT81k_Xpyyc_KhULC9W-QBFUKtFSSH4mG4cAGudQ/exec';
 const WA='919656703262';
 const UPI='farismuhammed006@okaxis';
-const BANNER='';   // optional: direct image link for the home banner
-// ==================================
+const BANNER='';
+// ====================
+
 const $=s=>document.querySelector(s),app=$('#app');
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let P=[],cart=[],F={q:'',cat:'',sort:''},sel='',qty=1;
@@ -101,21 +108,57 @@ const acl=()=>{$('#ml').textContent=me?(me.admin?'Admin panel':'My orders'):'Log
 const setAuth=(t,m)=>{tok=t;me=m;try{localStorage.setItem('tok',t);localStorage.setItem('me',JSON.stringify(m))}catch(e){}acl()};
 const api=(action,d={})=>fetch(API,{method:'POST',body:JSON.stringify({action,token:tok,...d})}).then(r=>r.json()).catch(()=>({ok:false,error:'Network error. Please try again.'}));
 const oc=o=>`<div class="oc"><b>${esc(o.orderId)}</b> · ${esc(o.time)}<br>${esc(o.name)} · <a href="tel:${esc(o.phone)}">${esc(o.phone)}</a><br>${esc(o.address)}<br>${esc(o.items)}<br><b>₹${esc(o.total)}</b> · ${esc(o.status)}${o.method?' · '+esc(o.method):''}${o.utr?'<br><small>Txn ID: '+esc(o.utr)+'</small>':''}${o.account?'<br><small>Account: '+esc(o.account)+'</small>':''}</div>`;
-function cats(){const c=[...new Set(P.map(p=>p.cat).filter(Boolean))];
-app.innerHTML=`<h2>Categories</h2>${c.length?`<div class="cats two">${c.map(x=>`<a href="#shop-${encodeURIComponent(x)}"><img src="${esc(P.find(p=>p.cat===x).imgs[0])}" alt=""><span>${esc(x)}</span></a>`).join('')}</div>`:'<p style="text-align:center">No categories yet.</p>'}`}
-function login(){app.innerHTML=`<h2>${mode=='reg'?'Create account':'Customer login'}</h2><div class="fm auth">${mode=='reg'?'<input id="an" placeholder="Full name">':''}<input id="ap" type="tel" placeholder="Phone number"><input id="aw" type="password" placeholder="Password (min 6 characters)"><button class="btn" style="width:100%" onclick="doAuth()">${mode=='reg'?'Create account':'Login'}</button><p class="sw" onclick="mode=mode=='reg'?'login':'reg';login()">${mode=='reg'?'Already have an account? Login':'New here? Create an account'}</p><p class="sw">Accounts are optional. You can order without one.</p></div>`}
-async function doAuth(){const d={phone:$('#ap').value,password:$('#aw').value};if(mode=='reg')d.name=$('#an').value;
-const r=await api(mode=='reg'?'register':'login',d);if(!r.ok)return alert(r.error||'Failed');setAuth(r.token,{name:r.name,phone:r.phone});location.hash='account'}
-async function account(){if(!me)return location.hash='login';if(me.admin)return location.hash='admin';
+
+function cats(){
+const c=[...new Set(P.map(p=>p.cat).filter(Boolean))];
+app.innerHTML=`<h2>Categories</h2>${c.length?`<div class="cats two">${c.map(x=>`<a href="#shop-${encodeURIComponent(x)}"><img src="${esc(P.find(p=>p.cat===x).imgs[0])}" alt=""><span>${esc(x)}</span></a>`).join('')}</div>`:'<p style="text-align:center">No categories yet.</p>'}`;
+}
+
+function login(){
+app.innerHTML=`<h2>${mode=='reg'?'Create account':'Customer login'}</h2><div class="fm auth">${mode=='reg'?'<input id="an" placeholder="Full name">':''}<input id="ap" type="tel" placeholder="Phone number"><input id="aw" type="password" placeholder="Password (min 6 characters)"><button class="btn" style="width:100%" onclick="doAuth()">${mode=='reg'?'Create account':'Login'}</button><p class="sw" onclick="mode=mode=='reg'?'login':'reg';login()">${mode=='reg'?'Already have an account? Login':'New here? Create an account'}</p><p class="sw">Accounts are optional. You can order without one.</p></div>`;
+}
+
+async function doAuth(){
+const d={phone:$('#ap').value,password:$('#aw').value};
+if(mode=='reg')d.name=$('#an').value;
+const r=await api(mode=='reg'?'register':'login',d);
+if(!r.ok)return alert(r.error||'Failed');
+setAuth(r.token,{name:r.name,phone:r.phone});
+location.hash='account';
+}
+
+async function account(){
+if(!me)return location.hash='login';
+if(me.admin)return location.hash='admin';
 app.innerHTML=`<h2>Hi, ${esc(me.name)}</h2><p style="text-align:center">Your orders</p><div id="ol">Loading…</div><p style="text-align:center"><button class="btn o" style="width:auto" onclick="logout()">Logout</button></p>`;
-const r=await api('myOrders');if(!r.ok)return logout();$('#ol').innerHTML=r.orders.map(oc).join('')||'<p style="text-align:center">No orders yet.</p>'}
+const r=await api('myOrders');
+if(!r.ok)return logout();
+$('#ol').innerHTML=r.orders.map(oc).join('')||'<p style="text-align:center">No orders yet.</p>';
+}
+
 async function admin(){
-if(me&&me.admin){app.innerHTML=`<h2>All orders</h2><p style="text-align:center"><button class="btn o" style="width:auto" onclick="logout()">Logout</button></p><div id="ol">Loading…</div>`;
-const r=await api('allOrders');if(!r.ok)return logout();$('#ol').innerHTML=`<p style="text-align:center">${r.orders.length} orders</p>`+r.orders.map(oc).join('');return}
-app.innerHTML=`<h2>Admin login</h2><div class="fm auth"><input id="aw" type="password" placeholder="Admin password"><button class="btn" style="width:100%" onclick="adm()">Login</button></div>`}
-async function adm(){const r=await api('adminLogin',{password:$('#aw').value});if(!r.ok)return alert(r.error||'Wrong password');setAuth(r.token,{name:'Admin',admin:true});admin()}
+if(me&&me.admin){
+app.innerHTML=`<h2>All orders</h2><p style="text-align:center"><button class="btn o" style="width:auto" onclick="logout()">Logout</button></p><div id="ol">Loading…</div>`;
+const r=await api('allOrders');
+if(!r.ok)return logout();
+$('#ol').innerHTML=`<p style="text-align:center">${r.orders.length} orders</p>`+r.orders.map(oc).join('');
+return;
+}
+app.innerHTML=`<h2>Admin login</h2><div class="fm auth"><input id="aw" type="password" placeholder="Admin password"><button class="btn" style="width:100%" onclick="adm()">Login</button></div>`;
+}
+
+async function adm(){
+const r=await api('adminLogin',{password:$('#aw').value});
+if(!r.ok)return alert(r.error||'Wrong password');
+setAuth(r.token,{name:'Admin',admin:true});
+admin();
+}
+
 function logout(){api('logout');setAuth('',null);location.hash='';route()}
-document.title=BRAND;$('#tag').textContent=TAGLINE;$('#logo').textContent=BRAND;
+
+document.title=BRAND;
+$('#tag').textContent=TAGLINE;
+$('#logo').textContent=BRAND;
 $('#foot').innerHTML='© '+esc(BRAND)+' · <a href="https://wa.me/'+WA+'">WhatsApp us</a>';
 $('#mb').onclick=()=>{$('#menu').classList.toggle('on');$('#mb').textContent=$('#menu').classList.contains('on')?'✕':'☰'};
 $('#wab').href='https://wa.me/'+WA;
@@ -130,45 +173,65 @@ app.innerHTML=`<section class="hero" ${BANNER?`style="background-image:url('${es
 <div class="trust"><div><b>Budget and premium</b>Ornaments for every occasion</div><div><b>Secure ordering</b>Confirmed on WhatsApp</div><div><b>All India delivery</b>We ship across India</div><div><b>Quality checked</b>Inspected before shipping</div></div>
 ${cats.length?`<h2 class="up">Top Collection</h2><div class="cats">${cats.map(c=>`<a href="#shop-${encodeURIComponent(c)}"><img src="${esc(P.find(p=>p.cat===c).imgs[0])}" alt=""><span>${esc(c)}</span></a>`).join('')}</div>`:''}
 <div class="promo">ALL INDIA DELIVERY · SECURE ORDERING</div>
-<h2>New Arrivals</h2><div class="grid">${P.slice(-8).reverse().map(card).join('')}</div>`}
+<h2>New Arrivals</h2><div class="grid">${P.slice(-8).reverse().map(card).join('')}</div>`;
+}
 
 function shop(cat){
-F.cat=cat||'';F.sort='';const cats=[...new Set(P.map(p=>p.cat).filter(Boolean))];
+F.cat=cat||'';F.sort='';
+const cats=[...new Set(P.map(p=>p.cat).filter(Boolean))];
 app.innerHTML=`<h2>Our Full Collection</h2><input id="q" class="srch" placeholder="Search products" value="${esc(F.q)}">
 <div class="row">${cats.length?`<select id="cat"><option value="">All categories</option>${cats.map(c=>`<option ${c===F.cat?'selected':''}>${esc(c)}</option>`).join('')}</select>`:''}<select id="so"><option value="">Sort by</option><option value="a">Price: low to high</option><option value="d">Price: high to low</option></select></div><div id="list" class="grid"></div>`;
-const up=()=>{F.q=$('#q').value;F.cat=$('#cat')?$('#cat').value:'';F.sort=$('#so').value;
+const up=()=>{
+F.q=$('#q').value;F.cat=$('#cat')?$('#cat').value:'';F.sort=$('#so').value;
 let l=P.filter(p=>(!F.cat||p.cat===F.cat)&&p.name.toLowerCase().includes(F.q.toLowerCase()));
 if(F.sort)l.sort((a,b)=>F.sort=='a'?a.price-b.price:b.price-a.price);
-$('#list').innerHTML=l.map(card).join('')||'<p>No products found. Try another search.</p>'};
-['q','cat','so'].forEach(i=>$('#'+i)&&($('#'+i).oninput=up));up()}
+$('#list').innerHTML=l.map(card).join('')||'<p>No products found. Try another search.</p>';
+};
+['q','cat','so'].forEach(i=>$('#'+i)&&($('#'+i).oninput=up));
+up();
+}
 
 function prod(id){
-const p=get(id);if(!p){app.innerHTML='<h2>Product not found</h2><p style="text-align:center"><a class="btn" href="#shop">Back to shop</a></p>';return}
-sel='';qty=1;const out=p.stock<=0;
+const p=get(id);
+if(!p){app.innerHTML='<h2>Product not found</h2><p style="text-align:center"><a class="btn" href="#shop">Back to shop</a></p>';return}
+sel='';qty=1;
+const out=p.stock<=0;
 app.innerHTML=`<div class="pg"><div><div class="big"><img id="mi" src="${esc(p.imgs[0])}" alt=""></div><div class="th">${p.imgs.map(i=>`<img src="${esc(i)}" alt="" onclick="$('#mi').src=this.src">`).join('')}</div></div>
 <div>${p.tag?`<span class="tag">${esc(p.tag)}</span>`:''}<h1 class="pt">${esc(p.name)}</h1>
 <div class="pr"><b>₹${p.price}</b>${p.old>p.price?`<s>₹${p.old}</s><em>${Math.round(100-p.price/p.old*100)}% off</em>`:''}</div>
 <ul class="ft"><li>✓ Quality checked before shipping</li><li>✓ Clear photos and accurate details</li><li>✓ Delivery across India</li></ul>
 ${p.sizes.length?`<p><b>Choose an option:</b></p><div class="sz">${p.sizes.map(s=>`<button data-s="${esc(s)}" onclick="pick(this)">${esc(s)}</button>`).join('')}</div>`:''}
 <div class="qr"><div class="q"><button onclick="qt(-1)">−</button><span id="qv">1</span><button onclick="qt(1)">+</button></div><button class="btn" ${out?'disabled':''} data-id="${esc(p.id)}" onclick="addC(this.dataset.id)">${out?'Sold out':'Add to cart'}</button></div>
-<button class="btn o" ${out?'disabled':''} data-id="${esc(p.id)}" onclick="addC(this.dataset.id,1)">Buy now</button></div></div>`}
+<button class="btn o" ${out?'disabled':''} data-id="${esc(p.id)}" onclick="addC(this.dataset.id,1)">Buy now</button></div></div>`;
+}
+
 function pick(b){document.querySelectorAll('.sz button').forEach(x=>x.classList.remove('on'));b.classList.add('on');sel=b.dataset.s}
 function qt(d){qty=Math.max(1,qty+d);$('#qv').textContent=qty}
-function addC(id,buy){const p=get(id);if(p.sizes.length&&!sel)return toast('Please choose an option');
-const e=cart.find(c=>c.id===id&&c.size===sel);e?e.qty+=qty:cart.push({id,size:sel,qty});save();
-buy?location.hash='cart':toast('Added to cart')}
+function addC(id,buy){
+const p=get(id);
+if(p.sizes.length&&!sel)return toast('Please choose an option');
+const e=cart.find(c=>c.id===id&&c.size===sel);
+e?e.qty+=qty:cart.push({id,size:sel,qty});
+save();
+buy?location.hash='cart':toast('Added to cart');
+}
 
 const lines=()=>cart.filter(c=>get(c.id));
 const total=()=>lines().reduce((a,c)=>a+get(c.id).price*c.qty,0);
+
 function cartV(){
-const L=lines();if(!L.length){app.innerHTML='<h2>Your cart</h2><p style="text-align:center">Your cart is empty.</p><p style="text-align:center"><a class="btn" href="#shop">Start shopping</a></p>';return}
+const L=lines();
+if(!L.length){app.innerHTML='<h2>Your cart</h2><p style="text-align:center">Your cart is empty.</p><p style="text-align:center"><a class="btn" href="#shop">Start shopping</a></p>';return}
 app.innerHTML=`<h2>Your cart</h2>${L.map(c=>{const p=get(c.id),i=cart.indexOf(c);return `<div class="ci"><img src="${esc(p.imgs[0])}" alt=""><div><b>${esc(p.name)}</b><br>${c.size?'Option: '+esc(c.size)+'<br>':''}₹${p.price}<br><span class="q"><button onclick="cq(${i},-1)">−</button><span>${c.qty}</span><button onclick="cq(${i},1)">+</button></span><button class="rm" onclick="cq(${i},-99)">Remove</button></div></div>`}).join('')}
 <div class="ship">Delivery across India. Pay by UPI or order on WhatsApp.</div>
 <div class="tot"><span>Total</span><span>₹${total()}</span></div>
 <div class="fm"><input id="cn2" placeholder="Full name"><input id="cp" type="tel" placeholder="Phone number"><textarea id="ca" rows="3" placeholder="Full delivery address with pincode"></textarea></div>
 <button class="btn" style="width:100%" id="po" onclick="place('upi')">Pay with UPI (GPay / PhonePe)</button>
-<button class="btn o" id="pw" onclick="place('wa')">Order on WhatsApp</button>`}
+<button class="btn o" id="pw" onclick="place('wa')">Order on WhatsApp</button>`;
+}
+
 function cq(i,d){cart[i].qty+=d;if(cart[i].qty<1)cart.splice(i,1);save();cartV()}
+
 async function place(m){
 const n=$('#cn2').value.trim(),ph=$('#cp').value.trim(),ad=$('#ca').value.trim();
 if(!n||ph.replace(/\D/g,'').length<10||!ad)return alert('Please fill your name, a 10-digit phone number and your full address.');
@@ -177,23 +240,83 @@ $('#po').disabled=true;$('#pw').disabled=true;
 const r=await Promise.race([api('order',{name:n,phone:ph,address:ad,items,total:t,method:m=='upi'?'UPI':'WhatsApp'}),new Promise(x=>setTimeout(()=>x({}),6000))]);
 if(m=='upi'){
 if(!r.orderId){$('#po').disabled=false;$('#pw').disabled=false;return alert('Could not place the order. Please try again or order on WhatsApp.')}
-cart=[];save();return payV(r.orderId,t)}
+cart=[];save();return payV(r.orderId,t);
+}
 cart=[];save();
-location.href='https://wa.me/'+WA+'?text='+encodeURIComponent(`New order${r.orderId?' '+r.orderId:''}\nName: ${n}\nPhone: ${ph}\nAddress: ${ad}\nItems: ${items}\nTotal: ₹${t}`)}
-function payV(id,t){
-const link='upi://pay?pa='+encodeURIComponent(UPI)+'&pn='+encodeURIComponent(BRAND)+'&am='+Number(t).toFixed(2)+'&cu=INR&tn='+encodeURIComponent('Order '+id);
-app.innerHTML=`<h2>Pay ₹${t}</h2><div class="paybox"><p style="text-align:center">Order number <b>${esc(id)}</b></p>
-<a class="btn" style="display:block" href="${esc(link)}">Pay with GPay / PhonePe / any UPI app</a>
-<p class="sw">UPI ID: <b>${esc(UPI)}</b> <button class="rm" onclick="navigator.clipboard.writeText(UPI);toast('UPI ID copied')">Copy</button></p>
-<p class="sw">If your UPI app does not open, copy the UPI ID, pay ₹${t} in any UPI app and write ${esc(id)} in the note.</p>
-<div class="fm"><input id="ut" placeholder="UPI transaction ID (optional)"></div>
-<button class="btn o" style="margin-top:0" onclick="paid('${esc(id)}',${t})">I have paid</button>
-<a class="btn o" style="display:block" href="https://wa.me/${WA}?text=${encodeURIComponent('Hi, I need help with order '+id)}">Need help? WhatsApp us</a></div>`}
-async function paid(id,t){const u=$('#ut').value.trim();
-await Promise.race([api('paid',{orderId:id,utr:u}),new Promise(x=>setTimeout(x,3000))]);
-location.href='https://wa.me/'+WA+'?text='+encodeURIComponent(`Payment done for order ${id}\nAmount: ₹${t} by UPI${u?'\nTransaction ID: '+u:''}\nI will send the payment screenshot here.`)}
+location.href='https://wa.me/'+WA+'?text='+encodeURIComponent(`New order${r.orderId?' '+r.orderId:''}\nName: ${n}\nPhone: ${ph}\nAddress: ${ad}\nItems: ${items}\nTotal: ₹${t}`);
+}
 
-function contact(){app.innerHTML=`<h2>Contact</h2><p style="text-align:center">Questions about an order or a design? Message us on WhatsApp.</p><p style="text-align:center"><a class="btn" href="https://wa.me/${WA}">Chat on WhatsApp</a></p>`}
+// ===== UPI PAYMENT FIX =====
+function openUPI(appName,id,amount){
+const params='pa='+encodeURIComponent(UPI)+
+'&pn='+encodeURIComponent(BRAND)+
+'&am='+Number(amount).toFixed(2)+
+'&cu=INR'+
+'&tn='+encodeURIComponent('Order '+id);
+
+let link='upi://pay?'+params;
+
+if(appName==='gpay'){
+link='intent://pay?'+params+
+'#Intent;scheme=upi;package=com.google.android.apps.nbu.paisa.user;end';
+}else if(appName==='phonepe'){
+link='intent://pay?'+params+
+'#Intent;scheme=upi;package=com.phonepe.app;end';
+}
+
+window.location.href=link;
+}
+
+function payV(id,t){
+const amount=Number(t);
+app.innerHTML=`<h2>Pay ₹${amount}</h2>
+<div class="paybox">
+<p style="text-align:center">Order number <b>${esc(id)}</b></p>
+
+<button class="btn" style="display:block;width:100%"
+onclick="openUPI('gpay','${esc(id)}',${amount})">
+Pay using Google Pay
+</button>
+
+<button class="btn o"
+onclick="openUPI('phonepe','${esc(id)}',${amount})">
+Pay using PhonePe
+</button>
+
+<button class="btn o"
+onclick="openUPI('other','${esc(id)}',${amount})">
+Other UPI apps
+</button>
+
+<p class="sw">UPI ID: <b>${esc(UPI)}</b>
+<button class="rm" onclick="navigator.clipboard.writeText(UPI).then(()=>toast('UPI ID copied')).catch(()=>toast('Please copy the UPI ID manually'))">Copy</button>
+</p>
+
+<p class="sw">If your UPI app does not open, copy the UPI ID and pay manually. Enter order number ${esc(id)} in the payment note.</p>
+
+<div class="fm"><input id="ut" placeholder="UPI transaction ID (optional)"></div>
+
+<button class="btn o" style="margin-top:0"
+onclick="paid('${esc(id)}',${amount})">
+I have paid
+</button>
+
+<a class="btn o" style="display:block"
+href="https://wa.me/${WA}?text=${encodeURIComponent('Hi, I need help with order '+id)}">
+Need help? WhatsApp us
+</a>
+</div>`;
+}
+
+async function paid(id,t){
+const u=$('#ut').value.trim();
+await Promise.race([api('paid',{orderId:id,utr:u}),new Promise(x=>setTimeout(x,3000))]);
+location.href='https://wa.me/'+WA+'?text='+encodeURIComponent(`Payment done for order ${id}\nAmount: ₹${t} by UPI${u?'\nTransaction ID: '+u:''}\nI will send the payment screenshot here.`);
+}
+
+function contact(){
+app.innerHTML=`<h2>Contact</h2><p style="text-align:center">Questions about an order or a design? Message us on WhatsApp.</p><p style="text-align:center"><a class="btn" href="https://wa.me/${WA}">Chat on WhatsApp</a></p>`;
+}
 
 function route(){
 const h=decodeURIComponent(location.hash.slice(1));
@@ -202,14 +325,32 @@ if(h.startsWith('p-'))prod(h.slice(2));
 else if(h.startsWith('shop'))shop(h.slice(5));
 else if(h==='cart')cartV();
 else if(h==='contact')contact();
-else if(h==='categories')cats();else if(h==='login')login();else if(h==='account')account();else if(h==='admin')admin();
-else home()}
-window.onhashchange=()=>P.length&&route();
+else if(h==='categories')cats();
+else if(h==='login')login();
+else if(h==='account')account();
+else if(h==='admin')admin();
+else home();
+}
 
+window.onhashchange=()=>P.length&&route();
 save();acl();
+
 fetch(API).then(r=>r.json()).then(d=>{
-P=d.filter(p=>p.name).map(p=>({id:String(p.id),name:p.name,price:+p.price||0,old:+p.oldPrice||0,tag:p.tag||'',cat:p.category||'',
+P=d.filter(p=>p.name).map(p=>({
+id:String(p.id),
+name:p.name,
+price:+p.price||0,
+old:+p.oldPrice||0,
+tag:p.tag||'',
+cat:p.category||'',
 imgs:String(p.images||p.image||'').split(',').map(s=>s.trim()).filter(Boolean),
-sizes:String(p.sizes||'').split(/[\s,]+/).filter(Boolean),stock:p.stock===''?99:+p.stock}));
-route()}).catch(()=>{app.innerHTML='<h2>Could not load products</h2><p style="text-align:center">Check the API link in the SETTINGS section of index.html.</p>'});
-</script></body></html>
+sizes:String(p.sizes||'').split(/[\s,]+/).filter(Boolean),
+stock:p.stock===''?99:+p.stock
+}));
+route();
+}).catch(()=>{
+app.innerHTML='<h2>Could not load products</h2><p style="text-align:center">Check the API link in the SETTINGS section of index.html.</p>';
+});
+</script>
+</body>
+</html>
