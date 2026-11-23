@@ -12,7 +12,7 @@ input{width:100%;padding:12px;border-radius:25px;border:1px solid #ccc;box-sizin
 <input id="q" placeholder="Search products">
 <div id="grid"></div>
 <script>
-const API = https://script.google.com/macros/s/AKfycby8aVJEu-qLAWz3Tf7HQXELxqBScIxT81k_Xpyyc_KhULC9W-QBFUKtFSSH4mG4cAGudQ/exec;
+const API = 'https://script.google.com/macros/s/AKfycby8aVJEu-qLAWz3Tf7HQXELxqBScIxT81k_Xpyyc_KhULC9W-QBFUKtFSSH4mG4cAGudQ/exec';
 let all = [];
 fetch(API).then(r => r.json()).then(d => { all = d; show(d); });
 function show(list){
