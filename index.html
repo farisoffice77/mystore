@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html><head>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>My Store</title>
+<style>
+body{font-family:sans-serif;margin:0;padding:12px}
+input{width:100%;padding:12px;border-radius:25px;border:1px solid #ccc;box-sizing:border-box}
+#grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.card img{width:100%;aspect-ratio:3/4;object-fit:cover}
+.old{text-decoration:line-through;color:#888}
+</style></head><body>
+<input id="q" placeholder="Search products">
+<div id="grid"></div>
+<script>
+const API = https://script.google.com/macros/s/AKfycby8aVJEu-qLAWz3Tf7HQXELxqBScIxT81k_Xpyyc_KhULC9W-QBFUKtFSSH4mG4cAGudQ/exec;
+let all = [];
+fetch(API).then(r => r.json()).then(d => { all = d; show(d); });
+function show(list){
+  grid.innerHTML = list.map(p => `
+    <div class="card">
+      <img src="${p.image}">
+      <div>${p.name}</div>
+      <b>₹${p.price}</b> <span class="old">₹${p.oldPrice}</span>
+    </div>`).join('');
+}
+q.oninput = () => show(all.filter(p => p.name.toLowerCase().includes(q.value.toLowerCase())));
+
+function order(o){
+  fetch(API, {method:'POST', headers:{'Content-Type':'text/plain'}, body:JSON.stringify(o)});
+  window.open('https://wa.me/919656703262?text=' + encodeURIComponent(
+    `Order from ${o.name}\n${o.items}\nTotal ₹${o.total}`));
+}
+</script></body></html>
