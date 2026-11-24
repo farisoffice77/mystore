@@ -110,7 +110,7 @@ async function account(){if(!me)return location.hash='login';if(me.admin)return 
 app.innerHTML=`<h2>Hi, ${esc(me.name)}</h2><p style="text-align:center">Your orders</p><div id="ol">Loading…</div><p style="text-align:center"><button class="btn o" style="width:auto" onclick="logout()">Logout</button></p>`;
 const r=await api('myOrders');if(!r.ok)return logout();$('#ol').innerHTML=r.orders.map(oc).join('')||'<p style="text-align:center">No orders yet.</p>'}
 async function admin(){
-if(me&&me.admin){app.innerHTML=`<h2>All orders</h2><p style="text-align:center"><button class="btn o" style="width:auto" onclick="logout()">Logout</button></p><div id="ol">Loading…</div>`;
+if(me&&me.admin){app.innerHTML=`<h2>All orders</h2><p style="text-align:center"><a class="btn" href="#admin-products">Manage products</a> <button class="btn o" style="width:auto" onclick="logout()">Logout</button></p><div id="ol">Loading…</div>`;
 const r=await api('allOrders');if(!r.ok)return logout();$('#ol').innerHTML=`<p style="text-align:center">${r.orders.length} orders</p>`+r.orders.map(oc).join('');return}
 app.innerHTML=`<h2>Admin login</h2><div class="fm auth"><input id="aw" type="password" placeholder="Admin password"><button class="btn" style="width:100%" onclick="adm()">Login</button></div>`}
 async function adm(){const r=await api('adminLogin',{password:$('#aw').value});if(!r.ok)return alert(r.error||'Wrong password');setAuth(r.token,{name:'Admin',admin:true});admin()}
@@ -183,9 +183,7 @@ location.href='https://wa.me/'+WA+'?text='+encodeURIComponent(`New order${r.orde
 function payV(id,t){
 const link='upi://pay?pa='+encodeURIComponent(UPI)+'&pn='+encodeURIComponent(BRAND)+'&am='+Number(t).toFixed(2)+'&cu=INR&tn='+encodeURIComponent('Order '+id);
 app.innerHTML=`<h2>Pay ₹${t}</h2><div class="paybox"><p style="text-align:center">Order number <b>${esc(id)}</b></p>
-<a class="btn" style="display:block" href="${esc('tez://upi/pay?'+link.slice(10))}">Pay with Google Pay</a>
-<a class="btn" style="display:block;margin-top:10px" href="${esc('phonepe://pay?'+link.slice(10))}">Pay with PhonePe</a>
-<a class="btn o" style="display:block" href="${esc(link)}">Other UPI apps (Paytm, BHIM)</a>
+<a class="btn" style="display:block" href="${esc(link)}">Pay with GPay / PhonePe / any UPI app</a>
 <p class="sw">UPI ID: <b>${esc(UPI)}</b> <button class="rm" onclick="navigator.clipboard.writeText(UPI);toast('UPI ID copied')">Copy</button></p>
 <p class="sw">If your UPI app does not open, copy the UPI ID, pay ₹${t} in any UPI app and write ${esc(id)} in the note.</p>
 <div class="fm"><input id="ut" placeholder="UPI transaction ID (optional)"></div>
@@ -194,6 +192,35 @@ app.innerHTML=`<h2>Pay ₹${t}</h2><div class="paybox"><p style="text-align:cent
 async function paid(id,t){const u=$('#ut').value.trim();
 await Promise.race([api('paid',{orderId:id,utr:u}),new Promise(x=>setTimeout(x,3000))]);
 location.href='https://wa.me/'+WA+'?text='+encodeURIComponent(`Payment done for order ${id}\nAmount: ₹${t} by UPI${u?'\nTransaction ID: '+u:''}\nI will send the payment screenshot here.`)}
+
+const er=r=>r.error=='auth'?'Session expired. Please login to Admin again.':(r.error||'Failed');
+async function reload(){const d=await fetch(API+'?t='+Date.now()).then(r=>r.json());
+P=d.filter(p=>p.name).map(p=>({id:String(p.id),name:p.name,price:+p.price||0,old:+p.oldPrice||0,tag:p.tag||'',cat:p.category||'',imgs:String(p.images||p.image||'').split(',').map(s=>s.trim()).filter(Boolean),sizes:String(p.sizes||'').split(/[\s,]+/).filter(Boolean),stock:(p.stock===''||p.stock==null)?99:+p.stock}))}
+function prodAdmin(){
+if(!(me&&me.admin)){location.hash='admin';return}
+app.innerHTML=`<h2>Manage products</h2><p style="text-align:center"><a class="btn o" style="width:auto;display:inline-block" href="#admin">Orders</a> <button class="btn" onclick="pform()">+ Add product</button></p><div id="pf"></div>${P.map(p=>`<div class="oc" style="overflow:hidden"><img src="${esc(p.imgs[0])}" alt="" style="width:60px;height:75px;object-fit:cover;float:left;margin-right:12px;border-radius:6px"><b>${esc(p.name)}</b><br>₹${p.price} · ${p.stock>=99?'in stock':'stock '+p.stock}${p.cat?' · '+esc(p.cat):''}<br><button class="rm" style="margin:0" onclick="pform('${esc(p.id)}')">Edit</button><button class="rm" onclick="pdel('${esc(p.id)}')">Delete</button></div>`).join('')||'<p style="text-align:center">No products yet.</p>'}`}
+function pform(id){const p=id?get(id):{},v=x=>esc(x==null?'':x);
+$('#pf').innerHTML=`<div class="fm auth oc"><b>${id?'Edit':'Add'} product</b><br><br>
+<input id="f_name" placeholder="Product name" value="${v(p.name)}">
+<input id="f_price" type="number" placeholder="Price (₹)" value="${v(p.price)}">
+<input id="f_old" type="number" placeholder="Old price (₹, optional)" value="${p.old?p.old:''}">
+<input id="f_cat" placeholder="Category (e.g. Earrings)" value="${v(p.cat)}">
+<input id="f_tag" placeholder="Tag (e.g. NEW, Budget, Premium)" value="${v(p.tag)}">
+<input id="f_sizes" placeholder="Options separated by space (optional)" value="${v((p.sizes||[]).join(' '))}">
+<input id="f_stock" type="number" placeholder="Stock (empty = always available)" value="${p.stock!=null&&p.stock<99?p.stock:''}">
+<textarea id="f_imgs" rows="3" placeholder="Image links (one per line)">${v((p.imgs||[]).join('\n'))}</textarea>
+<input id="f_file" type="file" accept="image/*" multiple>
+<p class="sw">Choose photos to upload. They are added to the links above.</p>
+<button class="btn" style="width:100%" id="f_save" onclick="psave('${id||''}')">Save product</button></div>`;scrollTo(0,0)}
+function shrink(f){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>{const i=new Image();i.onload=()=>{const s=Math.min(1,1000/Math.max(i.width,i.height)),c=document.createElement('canvas');c.width=i.width*s;c.height=i.height*s;c.getContext('2d').drawImage(i,0,0,c.width,c.height);res(c.toDataURL('image/jpeg',.8).split(',')[1])};i.onerror=rej;i.src=r.result};r.onerror=rej;r.readAsDataURL(f)})}
+async function psave(id){const b=$('#f_save');b.disabled=true;b.textContent='Saving…';
+try{const links=$('#f_imgs').value.split(/[\n,]+/).map(s=>s.trim()).filter(Boolean);
+for(const f of $('#f_file').files){b.textContent='Uploading photo…';const r=await api('uploadImage',{data:await shrink(f)});if(!r.ok)throw new Error(er(r));links.push(r.url)}
+const p={id,name:$('#f_name').value.trim(),price:$('#f_price').value,oldPrice:$('#f_old').value,category:$('#f_cat').value.trim(),tag:$('#f_tag').value.trim(),sizes:$('#f_sizes').value.trim(),stock:$('#f_stock').value,images:links.join(','),image:links[0]||''};
+if(!p.name||!p.price||!links.length)throw new Error('Name, price and at least one photo are required');
+b.textContent='Saving…';const r=await api('saveProduct',{product:p});if(!r.ok)throw new Error(er(r));
+await reload();prodAdmin();toast('Product saved')}catch(e){alert(e.message);b.disabled=false;b.textContent='Save product'}}
+async function pdel(id){if(!confirm('Delete this product?'))return;const r=await api('deleteProduct',{id});if(!r.ok)return alert(er(r));await reload();prodAdmin()}
 
 function contact(){app.innerHTML=`<h2>Contact</h2><p style="text-align:center">Questions about an order or a design? Message us on WhatsApp.</p><p style="text-align:center"><a class="btn" href="https://wa.me/${WA}">Chat on WhatsApp</a></p>`}
 
@@ -204,14 +231,10 @@ if(h.startsWith('p-'))prod(h.slice(2));
 else if(h.startsWith('shop'))shop(h.slice(5));
 else if(h==='cart')cartV();
 else if(h==='contact')contact();
-else if(h==='categories')cats();else if(h==='login')login();else if(h==='account')account();else if(h==='admin')admin();
+else if(h==='categories')cats();else if(h==='login')login();else if(h==='account')account();else if(h==='admin')admin();else if(h==='admin-products')prodAdmin();
 else home()}
 window.onhashchange=()=>P.length&&route();
 
 save();acl();
-fetch(API).then(r=>r.json()).then(d=>{
-P=d.filter(p=>p.name).map(p=>({id:String(p.id),name:p.name,price:+p.price||0,old:+p.oldPrice||0,tag:p.tag||'',cat:p.category||'',
-imgs:String(p.images||p.image||'').split(',').map(s=>s.trim()).filter(Boolean),
-sizes:String(p.sizes||'').split(/[\s,]+/).filter(Boolean),stock:p.stock===''?99:+p.stock}));
-route()}).catch(()=>{app.innerHTML='<h2>Could not load products</h2><p style="text-align:center">Check the API link in the SETTINGS section of index.html.</p>'});
+reload().then(route).catch(()=>{app.innerHTML='<h2>Could not load products</h2><p style="text-align:center">Check the API link in the SETTINGS section of index.html.</p>'});
 </script></body></html>
