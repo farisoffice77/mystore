@@ -100,6 +100,9 @@ const save=()=>{try{localStorage.setItem('cart',JSON.stringify(cart))}catch(e){}
 const toast=t=>{const e=$('#toast');e.textContent=t;e.style.display='block';setTimeout(()=>e.style.display='none',1800)};
 const get=id=>P.find(p=>p.id===id);
 const nm=x=>parseFloat(String(x==null?'':x).replace(/[^\d.]/g,''))||0;
+let cur='';
+const ps=x=>{const t=String(x==null?'':x);if(t.indexOf(':')<0)return{per:false,l:t.split(/[\s,]+/).filter(Boolean).map(n=>({n,s:null}))};const l=[];t.replace(/\s*([^:,]+?)\s*:\s*(\d+)/g,(m,n,q)=>{l.push({n:n.trim(),s:+q});return m});return{per:true,l}};
+const szs=(p,z)=>{if(!p.per||!z)return p.stock;const x=p.sizes.find(y=>y.n===z);return x?x.s:0};
 let tok='',me=null,mode='login';
 try{tok=localStorage.getItem('tok')||'';me=JSON.parse(localStorage.getItem('me')||'null')}catch(e){}
 const acl=()=>{$('#ml').textContent=me?(me.admin?'Admin panel':'My orders'):'Login / Sign up';$('#ml').href=me?(me.admin?'#admin':'#account'):'#login'};
@@ -127,7 +130,8 @@ $('#wab').href='https://wa.me/'+WA;
 $('#cb').onclick=()=>location.hash='cart';
 $('#sb').onclick=()=>{location.hash='shop';setTimeout(()=>$('#q')&&$('#q').focus(),50)};
 
-const lw=p=>{const t=p.stock<=0?'Sold out':p.stock==1?'Only 1 left':p.stock<=3?'Few items left':'';return t?`<div class="low">${t}</div>`:''};
+const lwn=n=>{const t=n<=0?'Sold out':n==1?'Only 1 left':n<=3?'Few items left':'';return t?`<div class="low">${t}</div>`:''};
+const lw=p=>lwn(p.stock);
 const card=p=>`<a class="card" href="#p-${esc(p.id)}"><div class="im">${p.tag?`<span class="b">${esc(p.tag)}</span>`:''}<img loading="lazy" src="${esc(p.imgs[0])}" alt=""></div><div class="n">${esc(p.name)}</div><div><b>₹${p.price}</b>${p.old>p.price?`<s>₹${p.old}</s><em>${Math.round(100-p.price/p.old*100)}% off</em>`:''}</div>${lw(p)}</a>`;
 
 function home(){
@@ -150,18 +154,20 @@ $('#list').innerHTML=l.map(card).join('')||'<p>No products found. Try another se
 
 function prod(id){
 const p=get(id);if(!p){app.innerHTML='<h2>Product not found</h2><p style="text-align:center"><a class="btn" href="#shop">Back to shop</a></p>';return}
-sel='';qty=1;const out=p.stock<=0;
+sel='';qty=1;cur=p.id;const out=p.stock<=0;
 app.innerHTML=`<div class="pg"><div><div class="big"><img id="mi" src="${esc(p.imgs[0])}" alt=""></div><div class="th">${p.imgs.map(i=>`<img src="${esc(i)}" alt="" onclick="$('#mi').src=this.src">`).join('')}</div></div>
 <div>${p.tag?`<span class="tag">${esc(p.tag)}</span>`:''}<h1 class="pt">${esc(p.name)}</h1>
 <div class="pr"><b>₹${p.price}</b>${p.old>p.price?`<s>₹${p.old}</s><em>${Math.round(100-p.price/p.old*100)}% off</em>`:''}</div>
-${lw(p)}<ul class="ft"><li>✓ Quality checked before shipping</li><li>✓ Clear photos and accurate details</li><li>✓ Delivery across India</li></ul>
-${p.sizes.length?`<p><b>Choose an option:</b></p><div class="sz">${p.sizes.map(s=>`<button data-s="${esc(s)}" onclick="pick(this)">${esc(s)}</button>`).join('')}</div>`:''}
+<div id="lw">${lw(p)}</div><ul class="ft"><li>✓ Quality checked before shipping</li><li>✓ Clear photos and accurate details</li><li>✓ Delivery across India</li></ul>
+${p.sizes.length?`<p><b>Choose an option:</b></p><div class="sz">${p.sizes.map(x=>`<button data-s="${esc(x.n)}" ${p.per&&x.s<=0?'disabled':''} onclick="pick(this)">${esc(x.n)}</button>`).join('')}</div>`:''}
 <div class="qr"><div class="q"><button onclick="qt(-1)">−</button><span id="qv">1</span><button onclick="qt(1)">+</button></div><button class="btn" ${out?'disabled':''} data-id="${esc(p.id)}" onclick="addC(this.dataset.id)">${out?'Sold out':'Add to cart'}</button></div>
 <button class="btn o" ${out?'disabled':''} data-id="${esc(p.id)}" onclick="addC(this.dataset.id,1)">Buy now</button></div></div>`}
-function pick(b){document.querySelectorAll('.sz button').forEach(x=>x.classList.remove('on'));b.classList.add('on');sel=b.dataset.s}
+function pick(b){document.querySelectorAll('.sz button').forEach(x=>x.classList.remove('on'));b.classList.add('on');sel=b.dataset.s;const pp=get(cur);if(pp)$('#lw').innerHTML=lwn(szs(pp,sel))}
 function qt(d){qty=Math.max(1,qty+d);$('#qv').textContent=qty}
 function addC(id,buy){const p=get(id);if(p.sizes.length&&!sel)return toast('Please choose an option');
-const e=cart.find(c=>c.id===id&&c.size===sel),have=cart.filter(c=>c.id===id).reduce((a,c)=>a+c.qty,0);if(have+qty>p.stock)return toast(p.stock<=0?'Sold out':'Only '+p.stock+' available');e?e.qty+=qty:cart.push({id,size:sel,qty});save();
+const mx=szs(p,sel),have=cart.filter(c=>c.id===id&&(p.per?c.size===sel:true)).reduce((a,c)=>a+c.qty,0);
+if(have+qty>mx)return toast(mx<=0?'Sold out':'Only '+mx+' available');
+const e=cart.find(c=>c.id===id&&c.size===sel);e?e.qty+=qty:cart.push({id,size:sel,qty});save();
 buy?location.hash='cart':toast('Added to cart')}
 
 const lines=()=>cart.filter(c=>get(c.id));
@@ -173,7 +179,9 @@ app.innerHTML=`<h2>Your cart</h2>${L.map(c=>{const p=get(c.id),i=cart.indexOf(c)
 <div class="tot"><span>Total</span><span>₹${total()}</span></div>
 <button class="btn" style="width:100%" id="po" onclick="ask('upi')">Pay with UPI (GPay / PhonePe)</button>
 <button class="btn o" id="pw" onclick="ask('wa')">Order on WhatsApp</button>`}
-function cq(i,d){const pp=get(cart[i].id);if(d>0&&pp&&cart[i].qty+d>pp.stock)return toast('Only '+pp.stock+' available');cart[i].qty+=d;if(cart[i].qty<1)cart.splice(i,1);save();cartV()}
+function cq(i,d){const c=cart[i],pp=get(c.id);
+if(d>0&&pp){const mx=szs(pp,c.size),have=cart.filter(x=>x.id===c.id&&(pp.per?x.size===c.size:true)).reduce((a,x)=>a+x.qty,0);if(have+d>mx)return toast('Only '+mx+' available')}
+c.qty+=d;if(c.qty<1)cart.splice(i,1);save();cartV()}
 function ask(m){const u=me&&!me.admin?me:{};const d=document.createElement('div');d.className='dlg';d.id='dlg';
 d.innerHTML=`<div class="box"><b>Delivery details</b><p class="sw" style="margin:6px 0 12px">Please enter your phone number and address to continue.</p><input id="dn" placeholder="Full name" value="${esc(u.name||'')}"><input id="dp" type="tel" placeholder="Phone number (10 digits)" value="${esc(u.phone||'')}"><textarea id="da" rows="3" placeholder="Full delivery address with pincode"></textarea><p id="de" style="color:var(--red);font-size:13px;margin:0 0 8px"></p><button class="btn" style="width:100%" onclick="go('${m}')">Continue</button><button class="btn o" onclick="$('#dlg').remove()">Cancel</button></div>`;
 document.body.appendChild(d)}
@@ -183,7 +191,7 @@ $('#dlg').remove();place(m,n,ph,ad)}
 async function place(m,n,ph,ad){
 const items=lines().map(c=>`${get(c.id).name}${c.size?' ('+c.size+')':''} x${c.qty}`).join(', '),t=total();
 $('#po').disabled=true;$('#pw').disabled=true;
-const r=await Promise.race([api('order',{name:n,phone:ph,address:ad,items,total:t,cartItems:lines().map(c=>({id:c.id,qty:c.qty})),method:m=='upi'?'UPI':'WhatsApp'}),new Promise(x=>setTimeout(()=>x({}),6000))]);
+const r=await Promise.race([api('order',{name:n,phone:ph,address:ad,items,total:t,cartItems:lines().map(c=>({id:c.id,size:c.size,qty:c.qty})),method:m=='upi'?'UPI':'WhatsApp'}),new Promise(x=>setTimeout(()=>x({}),6000))]);
 if(r.stock){alert(r.error);await reload();return cartV()}
 const T=r.total||t;
 if(m=='upi'){
@@ -209,7 +217,8 @@ location.href='https://wa.me/'+WA+'?text='+encodeURIComponent(`Payment done for 
 
 const er=r=>r.error=='auth'?'Session expired. Please login to Admin again.':(r.error||'Failed');
 async function reload(){const d=await fetch(API+'?t='+Date.now()).then(r=>r.json());
-P=d.filter(p=>p.name).map(p=>({id:String(p.id),name:p.name,price:nm(p.price),old:nm(p.oldPrice),tag:p.tag||'',cat:p.category||'',imgs:String(p.images||p.image||'').split(',').map(s=>s.trim()).filter(Boolean),sizes:String(p.sizes||'').split(/[\s,]+/).filter(Boolean),stock:(p.stock===''||p.stock==null)?0:nm(p.stock)}))}
+P=d.filter(p=>p.name).map(p=>{const z=ps(p.sizes),st=(p.stock===''||p.stock==null)?0:nm(p.stock);
+return{id:String(p.id),name:p.name,price:nm(p.price),old:nm(p.oldPrice),tag:p.tag||'',cat:p.category||'',imgs:String(p.images||p.image||'').split(',').map(x=>x.trim()).filter(Boolean),sizes:z.l,per:z.per,stock:z.per?z.l.reduce((a,x)=>a+x.s,0):st}})}
 function prodAdmin(){
 if(!(me&&me.admin)){location.hash='admin';return}
 app.innerHTML=`<h2>Manage products</h2><p style="text-align:center"><a class="btn o" style="width:auto;display:inline-block" href="#admin">Orders</a> <button class="btn" onclick="pform()">+ Add product</button></p><div id="pf"></div>${P.map(p=>`<div class="oc" style="overflow:hidden"><img src="${esc(p.imgs[0])}" alt="" style="width:60px;height:75px;object-fit:cover;float:left;margin-right:12px;border-radius:6px"><b>${esc(p.name)}</b><br>₹${p.price}${p.old>p.price?' <s>₹'+p.old+'</s>':''} · ${p.stock<=0?'SOLD OUT':'stock '+p.stock}${p.cat?' · '+esc(p.cat):''}<br><button class="rm" style="margin:0" onclick="pform('${esc(p.id)}')">Edit</button><button class="rm" onclick="pdel('${esc(p.id)}')">Delete</button></div>`).join('')||'<p style="text-align:center">No products yet.</p>'}`}
@@ -222,12 +231,15 @@ $('#pf').innerHTML=`<div class="fm auth oc"><b>${id?'Edit':'Add'} product</b><br
 <p id="f_prev" class="sw"></p>
 <input id="f_cat" placeholder="Category (e.g. Earrings)" value="${v(p.cat)}">
 <input id="f_tag" placeholder="Tag (e.g. NEW, Budget, Premium)" value="${v(p.tag)}">
-<input id="f_sizes" placeholder="Options separated by space (optional)" value="${v((p.sizes||[]).join(' '))}">
-<input id="f_stock" type="number" placeholder="Stock quantity (blank = sold out)" value="${p.stock>0?p.stock:''}">
+<p class="sw" style="text-align:left;margin:4px 0 8px"><b>Sizes / options with stock</b> (skip if the product has none)</p>
+<div id="f_sz">${(p.sizes||[]).map(x=>srow(x.n,x.s)).join('')}</div>
+<button class="btn o" style="margin:0 0 10px" onclick="$('#f_sz').insertAdjacentHTML('beforeend',srow())">+ Add size</button>
+<input id="f_stock" type="number" placeholder="Stock quantity (only if no sizes; blank = sold out)" value="${!p.per&&p.stock>0?p.stock:''}">
 <textarea id="f_imgs" rows="3" placeholder="Image links (one per line)">${v((p.imgs||[]).join('\n'))}</textarea>
 <input id="f_file" type="file" accept="image/*" multiple>
 <p class="sw">Choose photos to upload. They are added to the links above.</p>
 <button class="btn" style="width:100%" id="f_save" onclick="psave('${id||''}')">Save product</button></div>`;fprev();scrollTo(0,0)}
+function srow(n,q){return `<div style="display:flex;gap:8px;margin-bottom:8px"><input class="sn" placeholder="Size (e.g. M)" value="${esc(n||'')}" style="margin:0"><input class="sq" type="number" min="0" placeholder="Stock" value="${q==null?'':q}" style="margin:0;max-width:90px"><button class="rm" onclick="this.parentNode.remove()">✕</button></div>`}
 function fprev(){const p=nm($('#f_price').value),d=nm($('#f_disc').value);let o=nm($('#f_old').value);if(!o&&d&&d<100&&p)o=Math.round(p*100/(100-d));
 $('#f_prev').textContent=p&&o>p?'Customers will see: ₹'+p+'  (was ₹'+o+')  '+Math.round(100-p/o*100)+'% off':'No discount shown. The old price must be higher than the selling price.'}
 function shrink(f){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>{const i=new Image();i.onload=()=>{const s=Math.min(1,1000/Math.max(i.width,i.height)),c=document.createElement('canvas');c.width=i.width*s;c.height=i.height*s;c.getContext('2d').drawImage(i,0,0,c.width,c.height);res(c.toDataURL('image/jpeg',.8).split(',')[1])};i.onerror=rej;i.src=r.result};r.onerror=rej;r.readAsDataURL(f)})}
@@ -235,7 +247,9 @@ async function psave(id){const b=$('#f_save');b.disabled=true;b.textContent='Sav
 try{const links=$('#f_imgs').value.split(/[\n,]+/).map(s=>s.trim()).filter(Boolean);
 for(const f of $('#f_file').files){b.textContent='Uploading photo…';const r=await api('uploadImage',{data:await shrink(f)});if(!r.ok)throw new Error(er(r));links.push(r.url)}
 const pr=nm($('#f_price').value),dc=nm($('#f_disc').value);let ol=nm($('#f_old').value);if(!ol&&dc&&dc<100&&pr)ol=Math.round(pr*100/(100-dc));
-const p={id,name:$('#f_name').value.trim(),price:pr,oldPrice:ol>pr?ol:'',category:$('#f_cat').value.trim(),tag:$('#f_tag').value.trim(),sizes:$('#f_sizes').value.trim(),stock:$('#f_stock').value===''?'':nm($('#f_stock').value),images:links.join(','),image:links[0]||''};
+const zr=[...document.querySelectorAll('#f_sz .sn')].map((e,k)=>({n:e.value.trim().replace(/[:,]/g,' '),s:nm(document.querySelectorAll('#f_sz .sq')[k].value)})).filter(x=>x.n).map(x=>({n:/^\d+$/.test(x.n)?'Size '+x.n:x.n,s:x.s}));
+const szStr=zr.map(x=>x.n+':'+x.s).join(', '),stV=zr.length?zr.reduce((a,x)=>a+x.s,0):($('#f_stock').value===''?'':nm($('#f_stock').value));
+const p={id,name:$('#f_name').value.trim(),price:pr,oldPrice:ol>pr?ol:'',category:$('#f_cat').value.trim(),tag:$('#f_tag').value.trim(),sizes:szStr,stock:stV,images:links.join(','),image:links[0]||''};
 if(!p.name||!p.price||!links.length)throw new Error('Name, price and at least one photo are required');
 b.textContent='Saving…';const r=await api('saveProduct',{product:p});if(!r.ok)throw new Error(er(r));
 await reload();prodAdmin();toast('Product saved')}catch(e){alert(e.message);b.disabled=false;b.textContent='Save product'}}
